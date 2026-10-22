@@ -30,10 +30,13 @@ if not os.path.isfile(MODEL_PATH):
     st.write("Expected path:", MODEL_PATH)
     st.stop()
 
+
 try:
     bundle = load_model(MODEL_PATH)
+
+    # Temporary diagnostic
     st.write("Loaded file:", MODEL_PATH)
-st.write("Loaded object type:", type(bundle).__name__)
+    st.write("Loaded object type:", type(bundle).__name__)
 
     if not isinstance(bundle, dict):
         raise ValueError(
