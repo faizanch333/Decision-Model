@@ -30,31 +30,44 @@ if not os.path.isfile(MODEL_PATH):
     st.write("Expected path:", MODEL_PATH)
     st.stop()
 
-
 try:
     bundle = load_model(MODEL_PATH)
 
-    # Temporary diagnostic
-    st.write("Loaded file:", MODEL_PATH)
-    st.write("Loaded object type:", type(bundle).__name__)
+    if isinstance(bundle, dict):
+        model = bundle["model"]
+        features = bundle["features"]
+        options = bundle["options"]
+        metrics = bundle.get("metrics", {})
+        target = bundle.get("target", "Calories")
 
-    if not isinstance(bundle, dict):
-        raise ValueError(
-            "This is not the expected model bundle. "
-            "Run your Kaggle training code again."
-        )
+    else:
+        # Support a saved sklearn Pipeline
+        model = bundle
+        metrics = {}
+        target = "Calories"
 
-    model = bundle["model"]
-    features = bundle["features"]
-    options = bundle["options"]
+        # These must match the columns used during training.
+        features = list(getattr(model, "feature_names_in_", []))
+
+        if not features:
+            st.error(
+                "Your Pipeline does not expose feature names. "
+                "Please use the model bundle from Kaggle."
+            )
+            st.stop()
+
+        options = {}
+
+        for feature in features:
+            st.error(
+                f"Input options for '{feature}' are missing. "
+                "Please create the model bundle in Kaggle."
+            )
+            st.stop()
 
 except Exception as e:
     st.error("Could not load your model.")
     st.code(f"{type(e).__name__}: {e}")
-    st.info(
-        "Check your model file and use the same scikit-learn "
-        "version as the one used during training."
-    )
     st.stop()
 
 st.caption(f"Model file found: {os.path.basename(MODEL_PATH)}")
