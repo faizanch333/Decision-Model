@@ -32,6 +32,8 @@ if not os.path.isfile(MODEL_PATH):
 
 try:
     bundle = load_model(MODEL_PATH)
+    st.write("Loaded file:", MODEL_PATH)
+st.write("Loaded object type:", type(bundle).__name__)
 
     if not isinstance(bundle, dict):
         raise ValueError(
